@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import SideMenu, { SideMenuItemDescription } from "./components/Sidemenu";
 import ActionCheckFleet from "./components/actionCheckFleet";
 import EmptyActionComponent from "./components/EmptyActionComponent";
+import Settings from "./components/settings";
 
 type RenderActionComponent = (title: string) => JSX.Element;
 
@@ -26,9 +27,9 @@ const sideMenuItems: AppMenuDescription[] = [
     render: (title: string) => <ActionCheckFleet title={title} />,
   },
   {
-    id: "d",
-    title: "option D",
-    render: (title: string) => <ActionCheckFleet title={title} />,
+    id: "settings",
+    title: "Settings",
+    render: (title: string) => <Settings title={title} />,
   },
 ];
 
