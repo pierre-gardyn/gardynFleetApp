@@ -5,6 +5,8 @@ import { FormItem, FormValue } from "../form/types";
 import Title from "../title";
 import { getBooleanValue, getIntValue, getStringValue } from "../form/utils";
 import MessageLogs, { useLogs } from "../messageLogs";
+import { AzureGetOtaDevices } from "../../../wailsjs/go/main/App";
+import { config } from "../../config";
 
 const HW_PROFILES = ["hw_gm10", "hw_gh40", "hw_gh30"];
 
@@ -38,6 +40,23 @@ const formItems: FormItem[] = [
     },
   },
   {
+    fieldId: "lastOtaAction",
+    fieldType: "string",
+    helpText:
+      "device selection: : devices that have this last ota action being sent",
+    label: "Last ota action sent to device",
+    value: "",
+    validate: (value: string) => {
+      if (value === "") {
+        return [true, ""];
+      }
+      if (value.trim().length === 0) {
+        return [false, `must be a non empty string`];
+      }
+      return [true, ""];
+    },
+  },
+  {
     fieldId: "onlyEmployeeDevices",
     fieldType: "boolean",
     helpText: "check true if you want only employee devices",
@@ -60,13 +79,17 @@ const formItems: FormItem[] = [
 ];
 
 const ActionCheckFleet: React.FC<ActionProps> = ({ title }) => {
-  const { logs, addLog } = useLogs();
+  const { logs, addLog, clear } = useLogs();
 
   const doExecute = useCallback(
-    (values: FormValue[]) => {
+    async (values: FormValue[]) => {
+      // we clear the logs
+      clear();
       console.log("# execute with values:", values);
 
       const appVersion = getStringValue(values, "appVersion");
+      const hwProfile = getStringValue(values, "hwProfile");
+      const lastOtaAction = getStringValue(values, "lastOtaAction");
       const onlyEmployeeDevices = getBooleanValue(
         values,
         "onlyEmployeeDevices"
@@ -76,6 +99,17 @@ const ActionCheckFleet: React.FC<ActionProps> = ({ title }) => {
       addLog(
         `ready to execute with appVersion=${appVersion}, onlyEmployeeDevices=${onlyEmployeeDevices}, nbDays=${nbDays}`
       );
+      const devices = await AzureGetOtaDevices(
+        config.STORAGE_MAINTABLE_CONNECTIONSTRING,
+        {
+          AppVersion: appVersion,
+          HwProfile: hwProfile,
+          LastOtaAction: lastOtaAction,
+          OnlyEmployeeDevices: onlyEmployeeDevices,
+        }
+      );
+      console.log(JSON.stringify(devices));
+      addLog(JSON.stringify(devices));
       addLog("DONE");
     },
     [addLog]

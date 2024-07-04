@@ -20,7 +20,7 @@ const ActionForm: React.FC<ActionFormProps> = ({
   const [formValues, setFormValues] = useState<FormValue[]>([]);
   const [fieldItems, setFieldItems] = useState<FieldItem[]>([]);
 
-  useEffect(() => {
+  const resetData = useCallback(() => {
     const newFormItems: FormItem[] = [];
     const newFormValues: FormValue[] = [];
     const newFieldItems: FieldItem[] = [];
@@ -42,6 +42,10 @@ const ActionForm: React.FC<ActionFormProps> = ({
     setFieldItems(newFieldItems);
   }, [items]);
 
+  useEffect(() => {
+    resetData();
+  }, [items, resetData]);
+
   const [appState, setAppState] = useState<AppState>("definition");
 
   const onReady = useCallback(() => {
@@ -53,10 +57,10 @@ const ActionForm: React.FC<ActionFormProps> = ({
   }, []);
 
   const onAbort = useCallback(async () => {
+    resetData();
     await doAbort();
-    // TODO: actually abort
     setAppState("definition");
-  }, [doAbort]);
+  }, [doAbort, resetData]);
 
   const doUpdateValue = useCallback(
     (value: FormValue, label: string) => {
