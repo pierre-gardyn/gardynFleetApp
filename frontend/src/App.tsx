@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useState } from "react";
-import { Greet } from "../wailsjs/go/main/App";
 import SideMenu, { SideMenuItemDescription } from "./components/Sidemenu";
 import ActionCheckFleet from "./components/actionCheckFleet";
 import EmptyActionComponent from "./components/EmptyActionComponent";
@@ -34,15 +33,9 @@ const sideMenuItems: AppMenuDescription[] = [
 ];
 
 function App() {
-  const [title, setTitle] = useState("");
   const [currentComponent, setCurrentComponent] = useState<JSX.Element>(
     <EmptyActionComponent />
   );
-  const updateResultText = (result: string) => setTitle(result);
-
-  function greet() {
-    Greet("pierre").then(updateResultText);
-  }
 
   useEffect(() => {}, []);
 
@@ -53,7 +46,6 @@ function App() {
     } else {
       setCurrentComponent(<EmptyActionComponent />);
     }
-    setTitle(title);
   }, []);
 
   return (
