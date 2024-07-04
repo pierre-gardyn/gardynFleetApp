@@ -2,8 +2,14 @@ package main
 
 import (
 	"context"
-	"fmt"
+	"runtime"
+
+	"path/filepath"
+
+	"github.com/adrg/xdg"
 )
+
+const AppPrefix = "gardyn_fleet_app"
 
 // App struct
 type App struct {
@@ -21,7 +27,12 @@ func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
 }
 
-// Greet returns a greeting for the given name
-func (a *App) Greet(name string) string {
-	return fmt.Sprintf("Hello %s, It's show time!", name)
+func (a *App) OperatingSystem() string {
+	os := runtime.GOOS
+	return os
+}
+
+func (a *App) DataDirectory() string {
+	path := filepath.Join(xdg.UserDirs.Documents, AppPrefix)
+	return path
 }

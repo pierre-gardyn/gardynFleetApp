@@ -3,6 +3,7 @@ import SideMenu, { SideMenuItemDescription } from "./components/Sidemenu";
 import ActionCheckFleet from "./components/actionCheckFleet";
 import EmptyActionComponent from "./components/EmptyActionComponent";
 import Settings from "./components/settings";
+import ActionDeviceStatus from "./components/actionDeviceStatus";
 
 type RenderActionComponent = (title: string) => JSX.Element;
 
@@ -17,14 +18,9 @@ const sideMenuItems: AppMenuDescription[] = [
     render: (title: string) => <ActionCheckFleet title={title} />,
   },
   {
-    id: "b",
-    title: "option B",
-    render: (title: string) => <ActionCheckFleet title={title} />,
-  },
-  {
-    id: "c",
-    title: "option C",
-    render: (title: string) => <ActionCheckFleet title={title} />,
+    id: "device_status",
+    title: "Device Status",
+    render: (title: string) => <ActionDeviceStatus title={title} />,
   },
   {
     id: "settings",
