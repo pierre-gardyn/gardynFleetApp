@@ -29,7 +29,11 @@ export function useLogs() {
     },
     [logs]
   );
-  return { logs, addLog };
+
+  const clear = useCallback(() => {
+    setLogs([]);
+  }, []);
+  return { logs, addLog, clear };
 }
 
 export default MessageLogs;
