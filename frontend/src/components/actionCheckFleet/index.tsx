@@ -3,15 +3,37 @@ import { ActionProps } from "../types";
 import ActionForm from "../form";
 import { FormItem, FormValue } from "../form/types";
 import Title from "../title";
+import { getBooleanValue, getIntValue, getStringValue } from "../form/utils";
+import MessageLogs, { useLogs } from "../messageLogs";
+
+const HW_PROFILES = ["hw_gm10", "hw_gh40", "hw_gh30"];
 
 const formItems: FormItem[] = [
+  //
   {
     fieldId: "appVersion",
     fieldType: "string",
-    helpText: "the version of the app for the gardyns (or empty string)",
+    helpText: "device selection: the version of the app (or empty string)",
     label: "Application version on pi",
     value: "",
     validate: (value: string) => {
+      return [true, ""];
+    },
+  },
+  {
+    fieldId: "hwProfile",
+    fieldType: "string",
+    helpText:
+      "device selection: : the hardware profile of the pi (hw_gm10, ...)",
+    label: "Hardware profile of pi",
+    value: "",
+    validate: (value: string) => {
+      if (value === "") {
+        return [true, ""];
+      }
+      if (!HW_PROFILES.includes(value)) {
+        return [false, `hw profile must be one of: ${HW_PROFILES.join(",")}`];
+      }
       return [true, ""];
     },
   },
@@ -38,9 +60,26 @@ const formItems: FormItem[] = [
 ];
 
 const ActionCheckFleet: React.FC<ActionProps> = ({ title }) => {
-  const doExecute = useCallback((values: FormValue[]) => {
-    console.log("# execute with values:", values);
-  }, []);
+  const { logs, addLog } = useLogs();
+
+  const doExecute = useCallback(
+    (values: FormValue[]) => {
+      console.log("# execute with values:", values);
+
+      const appVersion = getStringValue(values, "appVersion");
+      const onlyEmployeeDevices = getBooleanValue(
+        values,
+        "onlyEmployeeDevices"
+      );
+      const nbDays = getIntValue(values, "nbDays");
+
+      addLog(
+        `ready to execute with appVersion=${appVersion}, onlyEmployeeDevices=${onlyEmployeeDevices}, nbDays=${nbDays}`
+      );
+      addLog("DONE");
+    },
+    [addLog]
+  );
 
   const doAbort = useCallback((): Promise<void> => {
     console.log("# aborting...");
@@ -54,6 +93,8 @@ const ActionCheckFleet: React.FC<ActionProps> = ({ title }) => {
       <Title title={title} />
 
       <ActionForm items={formItems} doExecute={doExecute} doAbort={doAbort} />
+
+      <MessageLogs logs={logs} />
     </div>
   );
 };
