@@ -99,6 +99,7 @@ const ActionCheckFleet: React.FC<ActionProps> = ({ title }) => {
       addLog(
         `ready to execute with appVersion=${appVersion}, onlyEmployeeDevices=${onlyEmployeeDevices}, nbDays=${nbDays}`
       );
+      addLog("retrieving list of devices from ota table...");
       const devices = await AzureGetOtaDevices(
         config.STORAGE_MAINTABLE_CONNECTIONSTRING,
         {
@@ -108,11 +109,11 @@ const ActionCheckFleet: React.FC<ActionProps> = ({ title }) => {
           OnlyEmployeeDevices: onlyEmployeeDevices,
         }
       );
-      console.log(JSON.stringify(devices));
-      addLog(JSON.stringify(devices));
+      addLog(`nb devices retrieved:${devices.length}`);
+      addLog(`first one:${JSON.stringify(devices[0], null, 2)}`);
       addLog("DONE");
     },
-    [addLog]
+    [addLog, clear]
   );
 
   const doAbort = useCallback((): Promise<void> => {
