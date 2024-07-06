@@ -5,7 +5,7 @@ import { FormItem, FormValue } from "../form/types";
 import Title from "../title";
 import { getBooleanValue, getIntValue, getStringValue } from "../form/utils";
 import MessageLogs, { useLogs } from "../messageLogs";
-import { GetFilteredListOfDevices } from "../../../wailsjs/go/main/App";
+import { getFilteredListDevices } from "../../utils/getFilteredListDevices";
 
 const HW_PROFILES = ["hw_gm10", "hw_gh40", "hw_gh30"];
 
@@ -97,13 +97,14 @@ const ActionCheckFleet: React.FC<ActionProps> = ({ title }) => {
       const nbDays = getIntValue(values, "nbDays");
 
       addLog(`retrieving list of devices`);
-      const devices = await GetFilteredListOfDevices({
-        AppVersion: appVersion,
-        HwProfile: hwProfile,
-        LastOtaAction: lastOtaAction,
-        OnlyEmployeeDevices: onlyEmployeeDevices,
+      const devices = await getFilteredListDevices({
+        appVersion,
+        hwProfile,
+        lastOtaAction,
+        onlyEmployeeDevices,
       });
       addLog(`list of devices: nbDevices=${devices.length}`);
+      addLog(`devices: ${devices.map((d) => d.AzureDeviceId).join(",")}`);
 
       addLog("DONE");
     },

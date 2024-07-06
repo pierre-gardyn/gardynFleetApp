@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 	"time"
 
 	wruntime "github.com/wailsapp/wails/v2/pkg/runtime"
@@ -24,6 +25,7 @@ const OTA_DEVICE_TABLE = "gOtaDevices"
 
 // device as stored in csv file
 type DeviceOta struct {
+	Serial           string `csv:"serial"`
 	AppVersion       string `csv:"app_version"`
 	AzureDeviceId    string `csv:"azure_device_id"`
 	HwProfile        string `csv:"hw_profile"`
@@ -191,6 +193,14 @@ func (a *App) retrieveDeviceList(serviceClient *aztables.ServiceClient, deviceFi
 				continue
 			}
 			numberOfDevices += 1
+
+			partition := myEntity.PartitionKey
+			index := strings.Index(partition, ":")
+			if index == -1 {
+				fmt.Printf("invali partition key %s\n", partition)
+				continue
+			}
+			currentDevice.Serial = partition[index+1:]
 
 			// send events to js app
 			if numberOfDevices%1000 == 0 {
