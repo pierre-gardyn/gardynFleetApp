@@ -19,6 +19,7 @@ function useProviderValue() {
   const [deviceListProgress, setDeviceListProgress] = useState("");
 
   const refreshDeviceListStatus = useCallback(() => {
+    console.log("@@ calling refreshDeviceListStatus...");
     GetDevicesListStatus()
       .then((status) => {
         console.log("@@@ refreshDeviceListStatus:", status);
@@ -30,6 +31,7 @@ function useProviderValue() {
   }, []);
 
   useEffect(() => {
+    console.log("@@@ useEffect -- EventsOn");
     // Listen for "myEvent"
     EventsOn(EVENT_DEVICES_LIST, (anyData) => {
       const data = anyData as string;
@@ -43,14 +45,17 @@ function useProviderValue() {
 
     return () => {
       // Clean up event listeners
+      console.log("@@@ useEffect -- cleanup");
     };
   }, [refreshDeviceListStatus]);
 
   useEffect(() => {
+    console.log("@@@ useEffect calls refreshDeviceListStatus...");
     refreshDeviceListStatus();
   }, [refreshDeviceListStatus]);
 
   const deviceListRefresh = useCallback(() => {
+    console.log("@@@ AppContext calls deviceListRefresh...");
     if (isDeviceListRefreshing) {
       return "Device refresh already in progress";
     }

@@ -15,6 +15,7 @@ const DevicesList: React.FC<ActionProps> = ({ title }) => {
   const onRefresh = useCallback(() => {
     deviceListRefresh();
   }, [deviceListRefresh]);
+
   return (
     <div>
       <Title title={title} />

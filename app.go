@@ -160,21 +160,29 @@ func (a *App) retrieveDeviceList(serviceClient *aztables.ServiceClient, deviceFi
 	tableClient := serviceClient.NewClient(tableName)
 
 	// Set the desired page size
-	pageSize := int32(1000)
+	// pageSize := int32(1000)
 
 	wruntime.EventsEmit(a.ctx, EVENT_DEVICES_LIST, "started")
 
+	// Create a filter to retrieve all items with the given RowKey
+	rowKey := "device"
+	filter := fmt.Sprintf("RowKey eq '%s'", rowKey)
+
 	// Create ListEntitiesOptions with the desired page size
 	options := &aztables.ListEntitiesOptions{
-		Top: &pageSize,
+		Filter: &filter,
+		// Top:    &pageSize,
 	}
 
 	// Query all entities in the table
 	pager := tableClient.NewListEntitiesPager(options)
 	numberOfDevices := int32(0)
+	countPage := 0
+	t0 := time.Now()
 
 	// Iterate over the entities
 	for pager.More() {
+		countPage++
 		resp, err := pager.NextPage(context.Background())
 		if err != nil {
 			log.Println("Failed to get next page:", err)
@@ -229,6 +237,7 @@ func (a *App) retrieveDeviceList(serviceClient *aztables.ServiceClient, deviceFi
 			listOfDevices = append(listOfDevices, currentDevice)
 		}
 	}
+	fmt.Printf("# duration: t0 ms=%d, %d pages, %d devices\n", time.Since(t0).Milliseconds(), countPage, numberOfDevices)
 
 	// write csv files
 	// Create the CSV file1
