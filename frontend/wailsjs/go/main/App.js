@@ -10,6 +10,10 @@ export function GetDevicesListStatus() {
   return window['go']['main']['App']['GetDevicesListStatus']();
 }
 
+export function GetFilteredListOfDevices(arg1) {
+  return window['go']['main']['App']['GetFilteredListOfDevices'](arg1);
+}
+
 export function OperatingSystem() {
   return window['go']['main']['App']['OperatingSystem']();
 }

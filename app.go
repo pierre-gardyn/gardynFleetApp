@@ -33,12 +33,19 @@ type DeviceOta struct {
 }
 
 type DeviceOtaMeta struct {
-	LastUpdateDate   string `csv:"last_update_date"`
-	NbDevices        int32  `csv:"nb_devices"`
-	DownloadDuration int32  `csv:"download_duration"`
-	DeviceCsvPath         string `csv:"_"`
-	DeviceMetaCsvPath         string `csv:"_"`
-	Message          string `csv:""`
+	LastUpdateDate    string `csv:"last_update_date"`
+	NbDevices         int32  `csv:"nb_devices"`
+	DownloadDuration  int32  `csv:"download_duration"`
+	DeviceCsvPath     string `csv:"_"`
+	DeviceMetaCsvPath string `csv:"_"`
+	Message           string `csv:""`
+}
+
+type OtaDevicesFilter struct {
+	AppVersion          string
+	HwProfile           string
+	LastOtaAction       string
+	OnlyEmployeeDevices bool
 }
 
 // App struct
@@ -67,18 +74,12 @@ func (a *App) DataDirectory() string {
 	return path
 }
 
-type OtaDevicesFilter struct {
-	AppVersion          string
-	HwProfile           string
-	LastOtaAction       string
-	OnlyEmployeeDevices bool
-}
-
+// returns the status of the current list of downloaded devices
 func (a *App) GetDevicesListStatus() DeviceOtaMeta {
 	deviceFilePath := getDeviceCsvFilePath()
 	deviceMetaFilePath := getDeviceMetaCsvFilePath()
 	defaultReturn := DeviceOtaMeta{
-		DeviceCsvPath: deviceFilePath,
+		DeviceCsvPath:     deviceFilePath,
 		DeviceMetaCsvPath: deviceMetaFilePath,
 	}
 
@@ -104,7 +105,7 @@ func (a *App) GetDevicesListStatus() DeviceOtaMeta {
 		return defaultReturn
 	}
 
-	if (len(meta) != 1) {
+	if len(meta) != 1 {
 		defaultReturn.Message = fmt.Sprintf("wrong number of records: %d", len(meta))
 		return defaultReturn
 	}
@@ -119,6 +120,7 @@ func (a *App) GetDevicesListStatus() DeviceOtaMeta {
 	return defaultReturn
 }
 
+// update list of devices
 func (a *App) UpdateOtaDeviceList(connString string) string {
 	deviceFilePath := getDeviceCsvFilePath()
 	deviceMetaFilePath := getDeviceMetaCsvFilePath()
@@ -253,4 +255,67 @@ func (a *App) retrieveDeviceList(serviceClient *aztables.ServiceClient, deviceFi
 
 	// notify js that loading is over
 	wruntime.EventsEmit(a.ctx, EVENT_DEVICES_LIST, "!ended")
+}
+
+// extract the list of devices matching a given criteria
+func (a *App) GetFilteredListOfDevices(filter OtaDevicesFilter) []DeviceOta {
+	devices := []DeviceOta{}
+
+	fmt.Printf("@@ filter: %v\n", filter)
+
+	deviceFilePath := getDeviceCsvFilePath()
+
+	if _, err := os.Stat(deviceFilePath); os.IsNotExist(err) {
+		log.Printf("File %s does not exist", deviceFilePath)
+		return devices
+	}
+
+	// Open the CSV file
+	file, err := os.Open(deviceFilePath)
+	if err != nil {
+		fmt.Printf("Error opening file: %v\n", err)
+		return devices
+	}
+	defer file.Close()
+
+	// Create a slice to hold the CSV data
+	var csvDevices []*DeviceOta
+
+	// Read the CSV file into the slice
+	if err := gocsv.UnmarshalFile(file, &csvDevices); err != nil {
+		fmt.Printf("Error reading CSV: %v\n", err)
+		return devices
+	}
+
+	for _, device := range csvDevices {
+		fmt.Printf("device: %+v\n", device)
+		// check first if we limit to employee devices
+		if filter.OnlyEmployeeDevices && !device.IsEmployeeDevice {
+			continue
+		}
+
+		// check if device matches other filters
+		if filter.AppVersion != "" {
+			if device.AppVersion == filter.AppVersion {
+				devices = append(devices, *device)
+			}
+			continue
+		}
+		if filter.HwProfile != "" {
+			if device.HwProfile == filter.HwProfile {
+				devices = append(devices, *device)
+			}
+			continue
+		}
+		if filter.LastOtaAction != "" {
+			if device.LastActionSent == filter.LastOtaAction {
+				devices = append(devices, *device)
+			}
+			continue
+		}
+	}
+
+	fmt.Printf("@@ filter: %v\n", filter)
+
+	return devices
 }

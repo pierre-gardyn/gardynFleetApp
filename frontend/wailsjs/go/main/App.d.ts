@@ -6,6 +6,8 @@ export function DataDirectory():Promise<string>;
 
 export function GetDevicesListStatus():Promise<main.DeviceOtaMeta>;
 
+export function GetFilteredListOfDevices(arg1:main.OtaDevicesFilter):Promise<Array<main.DeviceOta>>;
+
 export function OperatingSystem():Promise<string>;
 
 export function UpdateOtaDeviceList(arg1:string):Promise<string>;
