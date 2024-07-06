@@ -95,6 +95,14 @@ func getIsoNow() string {
 
 }
 
+func toIso(currentTimeUTC time.Time) string {
+	// Format the time as ISO 8601
+	iso8601 := currentTimeUTC.Format(time.RFC3339)
+
+	return iso8601
+
+}
+
 func ensureDir(path string) error {
 	// Get the directory part of the path
 	dir := filepath.Dir(path)

@@ -6,6 +6,8 @@ import Title from "../title";
 import { getBooleanValue, getIntValue, getStringValue } from "../form/utils";
 import MessageLogs, { useLogs } from "../messageLogs";
 import { getFilteredListDevices } from "../../utils/getFilteredListDevices";
+import { config } from "../../config";
+import { getListBlobs } from "../../utils/getListBlobs";
 
 const HW_PROFILES = ["hw_gm10", "hw_gh40", "hw_gh30"];
 
@@ -104,7 +106,16 @@ const ActionCheckFleet: React.FC<ActionProps> = ({ title }) => {
         onlyEmployeeDevices,
       });
       addLog(`list of devices: nbDevices=${devices.length}`);
-      addLog(`devices: ${devices.map((d) => d.AzureDeviceId).join(",")}`);
+
+      addLog(`retrieving pictures...`);
+      const blobs = await getListBlobs(
+        config.STORAGE_BLOB_IMAGES_CONNECTIONSTRING,
+        "iot-camera-image",
+        "camera1_f4b37836faabd68feed09b79ead55e17_",
+        -1
+      );
+      addLog(`blobs: ${blobs.length}`);
+      addLog(`retrieving pictures: done`);
 
       addLog("DONE");
     },

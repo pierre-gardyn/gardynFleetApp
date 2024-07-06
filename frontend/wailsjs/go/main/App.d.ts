@@ -10,4 +10,6 @@ export function GetFilteredListOfDevices(arg1:main.OtaDevicesFilter):Promise<Arr
 
 export function OperatingSystem():Promise<string>;
 
+export function RetrieveBlobsWithPrefix(arg1:string,arg2:string,arg3:string,arg4:number):Promise<Array<main.BlobInformation>>;
+
 export function UpdateOtaDeviceList(arg1:string):Promise<string>;

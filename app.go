@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -13,7 +14,10 @@ import (
 
 	wruntime "github.com/wailsapp/wails/v2/pkg/runtime"
 
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore/to"
 	"github.com/Azure/azure-sdk-for-go/sdk/data/aztables"
+	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob"
+
 	"github.com/adrg/xdg"
 	"github.com/gocarina/gocsv"
 )
@@ -48,6 +52,13 @@ type OtaDevicesFilter struct {
 	HwProfile           string
 	LastOtaAction       string
 	OnlyEmployeeDevices bool
+}
+
+type BlobInformation struct {
+	Name         string
+	AccessTier   string
+	LastModified string
+	ContentMD5   string
 }
 
 // App struct
@@ -341,4 +352,46 @@ func (a *App) GetFilteredListOfDevices(filter OtaDevicesFilter) []DeviceOta {
 	fmt.Printf("#GetFilteredListOfDevices: done, %d devices\n", len(devices))
 
 	return devices
+}
+
+func (a *App) RetrieveBlobsWithPrefix(connectionString string, containerName string, prefix string, nbMaxItems int16) []BlobInformation {
+	blobs := []BlobInformation{}
+	// Create a service client using the connection string
+	serviceClient, err := azblob.NewClientFromConnectionString(connectionString, nil)
+
+	if err != nil {
+		log.Printf("Failed to create service client: %v", err)
+		return blobs
+	}
+
+	// List the blobs in the container with a prefix
+	pager := serviceClient.NewListBlobsFlatPager(containerName, &azblob.ListBlobsFlatOptions{
+		Prefix: to.Ptr(prefix),
+	})
+
+	fmt.Println("List blobs with prefix:")
+	count := int16(0)
+	for pager.More() {
+		resp, err := pager.NextPage(context.TODO())
+		if err != nil {
+			fmt.Println("error:", err)
+		} else {
+			for _, blob := range resp.Segment.BlobItems {
+				count++
+				theBlob := BlobInformation{}
+				theBlob.Name = *blob.Name
+				theBlob.AccessTier = string(*blob.Properties.AccessTier)
+				theBlob.LastModified = toIso(*blob.Properties.LastModified)
+				theBlob.ContentMD5 = hex.EncodeToString(blob.Properties.ContentMD5)
+				blobs = append(blobs, theBlob)
+				fmt.Printf("# blob #%d : %s\n", count, *blob.Name)
+				// fmt.Printf("ContentLength: %d\n", blob.Properties.ContentLength) // not reliable value
+				//fmt.Printf("LastAccessedOn: %s\n", *blob.Properties.LastAccessedOn)
+				if nbMaxItems > 0 && count >= nbMaxItems {
+					break
+				}
+			}
+		}
+	}
+	return blobs
 }
