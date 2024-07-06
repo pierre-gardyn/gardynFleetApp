@@ -5,11 +5,11 @@ import ResultFields, { FieldItem } from "./ResultFields";
 
 export interface ActionFormProps {
   items: FormItem[];
-  doExecute: (values: FormValue[]) => void;
+  doExecute: (values: FormValue[]) => Promise<void>;
   doAbort: () => Promise<void>;
 }
 
-type AppState = "definition" | "ready" | "running";
+type AppState = "definition" | "ready" | "running" | "done";
 
 const ActionForm: React.FC<ActionFormProps> = ({
   items,
@@ -92,7 +92,7 @@ const ActionForm: React.FC<ActionFormProps> = ({
 
   const onRun = useCallback(() => {
     setAppState("running");
-    doExecute(formValues);
+    doExecute(formValues).then(() => setAppState("done"));
   }, [doExecute, formValues]);
 
   return (

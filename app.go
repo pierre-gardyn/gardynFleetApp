@@ -261,7 +261,7 @@ func (a *App) retrieveDeviceList(serviceClient *aztables.ServiceClient, deviceFi
 func (a *App) GetFilteredListOfDevices(filter OtaDevicesFilter) []DeviceOta {
 	devices := []DeviceOta{}
 
-	fmt.Printf("@@ filter: %v\n", filter)
+	fmt.Printf("# GetFilteredListOfDevices, filter: %v\n", filter)
 
 	deviceFilePath := getDeviceCsvFilePath()
 
@@ -288,7 +288,7 @@ func (a *App) GetFilteredListOfDevices(filter OtaDevicesFilter) []DeviceOta {
 	}
 
 	for _, device := range csvDevices {
-		fmt.Printf("device: %+v\n", device)
+		// fmt.Printf("device: %+v\n", device)
 		// check first if we limit to employee devices
 		if filter.OnlyEmployeeDevices && !device.IsEmployeeDevice {
 			continue
@@ -313,9 +313,13 @@ func (a *App) GetFilteredListOfDevices(filter OtaDevicesFilter) []DeviceOta {
 			}
 			continue
 		}
+
+		// in case there was no filter.. we adsd device
+		devices = append(devices, *device)
+
 	}
 
-	fmt.Printf("@@ filter: %v\n", filter)
+	fmt.Printf("#GetFilteredListOfDevices: done, %d devices\n", len(devices))
 
 	return devices
 }

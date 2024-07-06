@@ -25,7 +25,7 @@ const formItems: FormItem[] = [
     fieldId: "hwProfile",
     fieldType: "string",
     helpText:
-      "device selection: : the hardware profile of the pi (hw_gm10, ...)",
+      "device selection: : the hardware profile of the pi (hw_gm10, hw_gh30, hw_gh40)",
     label: "Hardware profile of pi",
     value: "",
     validate: (value: string) => {
@@ -103,7 +103,6 @@ const ActionCheckFleet: React.FC<ActionProps> = ({ title }) => {
         OnlyEmployeeDevices: onlyEmployeeDevices,
       });
       addLog(`list of devices: nbDevices=${devices.length}`);
-      addLog(`list of devices: ${JSON.stringify(devices, null, 2)}`);
 
       addLog("DONE");
     },
@@ -123,6 +122,7 @@ const ActionCheckFleet: React.FC<ActionProps> = ({ title }) => {
 
       <ActionForm items={formItems} doExecute={doExecute} doAbort={doAbort} />
 
+      <hr />
       <MessageLogs logs={logs} />
     </div>
   );
