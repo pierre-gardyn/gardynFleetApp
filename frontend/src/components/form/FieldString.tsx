@@ -45,6 +45,7 @@ const FieldString: React.FC<FieldStringProps> = ({
       <div className="control">
         <input
           className={classnames("input", { "is-danger": inError })}
+          autoCapitalize="none"
           type="text"
           value={inputValue}
           onChange={handleInputChange}

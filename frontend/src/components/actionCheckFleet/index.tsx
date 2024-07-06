@@ -24,8 +24,9 @@ const formItems: FormItem[] = [
   {
     fieldId: "hwProfile",
     fieldType: "string",
-    helpText:
-      "device selection: : the hardware profile of the pi (hw_gm10, hw_gh30, hw_gh40)",
+    helpText: `device selection: : the hardware profile of the pi (${HW_PROFILES.join(
+      ","
+    )})`,
     label: "Hardware profile of pi",
     value: "",
     validate: (value: string) => {
@@ -110,17 +111,25 @@ const ActionCheckFleet: React.FC<ActionProps> = ({ title }) => {
   );
 
   const doAbort = useCallback((): Promise<void> => {
-    console.log("# aborting...");
-    return new Promise((resolve) => {
-      setTimeout(resolve, 2000);
-    });
+    // nothing fo do, yet?
+    return Promise.resolve();
   }, []);
+
+  const doClear = useCallback((): Promise<void> => {
+    clear();
+    return Promise.resolve();
+  }, [clear]);
 
   return (
     <div>
       <Title title={title} />
 
-      <ActionForm items={formItems} doExecute={doExecute} doAbort={doAbort} />
+      <ActionForm
+        items={formItems}
+        doExecute={doExecute}
+        doAbort={doAbort}
+        doClear={doClear}
+      />
 
       <hr />
       <MessageLogs logs={logs} />

@@ -7,6 +7,7 @@ export interface ActionFormProps {
   items: FormItem[];
   doExecute: (values: FormValue[]) => Promise<void>;
   doAbort: () => Promise<void>;
+  doClear: () => Promise<void>;
 }
 
 type AppState = "definition" | "ready" | "running" | "done";
@@ -15,6 +16,7 @@ const ActionForm: React.FC<ActionFormProps> = ({
   items,
   doExecute,
   doAbort,
+  doClear,
 }) => {
   const [formItems, setFormItems] = useState<FormItem[]>([]);
   const [formValues, setFormValues] = useState<FormValue[]>([]);
@@ -95,6 +97,12 @@ const ActionForm: React.FC<ActionFormProps> = ({
     doExecute(formValues).then(() => setAppState("done"));
   }, [doExecute, formValues]);
 
+  const onClear = useCallback(() => {
+    resetData();
+    doClear();
+    setAppState("definition");
+  }, [doClear, resetData]);
+
   return (
     <div>
       {appState === "definition" && (
@@ -123,6 +131,13 @@ const ActionForm: React.FC<ActionFormProps> = ({
         <div className="buttons is-centered">
           <button className="button is-warning" onClick={onAbort}>
             Abort
+          </button>
+        </div>
+      )}
+      {appState === "done" && (
+        <div className="buttons is-centered">
+          <button className="button is-warning" onClick={onClear}>
+            Clear
           </button>
         </div>
       )}
