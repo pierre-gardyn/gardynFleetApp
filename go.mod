@@ -7,6 +7,7 @@ toolchain go1.22.5
 require (
 	github.com/Azure/azure-sdk-for-go/sdk/data/aztables v1.2.0
 	github.com/adrg/xdg v0.4.0
+	github.com/gocarina/gocsv v0.0.0-20240520201108-78e41c74b4b1
 	github.com/wailsapp/wails/v2 v2.9.1
 )
 

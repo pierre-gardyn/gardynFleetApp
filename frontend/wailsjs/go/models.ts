@@ -1,10 +1,10 @@
 export namespace main {
 	
-	export class OtaDevicesFilter {
+	export class DeviceOtaMeta {
 	
 	
 	    static createFrom(source: any = {}) {
-	        return new OtaDevicesFilter(source);
+	        return new DeviceOtaMeta(source);
 	    }
 	
 	    constructor(source: any = {}) {

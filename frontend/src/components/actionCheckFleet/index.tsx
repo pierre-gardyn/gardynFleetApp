@@ -5,8 +5,6 @@ import { FormItem, FormValue } from "../form/types";
 import Title from "../title";
 import { getBooleanValue, getIntValue, getStringValue } from "../form/utils";
 import MessageLogs, { useLogs } from "../messageLogs";
-import { AzureGetOtaDevices } from "../../../wailsjs/go/main/App";
-import { config } from "../../config";
 
 const HW_PROFILES = ["hw_gm10", "hw_gh40", "hw_gh30"];
 
@@ -99,18 +97,6 @@ const ActionCheckFleet: React.FC<ActionProps> = ({ title }) => {
       addLog(
         `ready to execute with appVersion=${appVersion}, onlyEmployeeDevices=${onlyEmployeeDevices}, nbDays=${nbDays}`
       );
-      addLog("retrieving list of devices from ota table...");
-      const devices = await AzureGetOtaDevices(
-        config.STORAGE_MAINTABLE_CONNECTIONSTRING,
-        {
-          AppVersion: appVersion,
-          HwProfile: hwProfile,
-          LastOtaAction: lastOtaAction,
-          OnlyEmployeeDevices: onlyEmployeeDevices,
-        }
-      );
-      addLog(`nb devices retrieved:${devices.length}`);
-      addLog(`first one:${JSON.stringify(devices[0], null, 2)}`);
       addLog("DONE");
     },
     [addLog, clear]

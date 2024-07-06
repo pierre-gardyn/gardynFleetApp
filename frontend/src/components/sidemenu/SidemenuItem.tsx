@@ -6,6 +6,7 @@ interface SideMenuItemProps {
   id: string;
   title: string;
   isSelected: boolean;
+  isSelectable?: boolean;
   onSelectedItem: (id: string, title: string) => void;
 }
 
